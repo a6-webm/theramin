@@ -1,0 +1,3 @@
+[submodule "manymouse"]
+	path = manymouse
+	url = gitub:icculus/manymouse.git
