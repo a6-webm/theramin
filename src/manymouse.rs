@@ -1,6 +1,6 @@
 use std::{
     ffi::{c_char, c_int, c_uint, CStr},
-    ptr::null_mut,
+    mem::MaybeUninit,
 };
 
 extern "C" {
@@ -8,7 +8,7 @@ extern "C" {
     fn ManyMouse_DriverName() -> *const c_char;
     fn ManyMouse_Quit();
     fn ManyMouse_DeviceName(index: c_uint) -> *const c_char;
-    pub fn ManyMouse_PollEvent(event: *mut Event) -> c_int; // TODO pub for testing
+    fn ManyMouse_PollEvent(event: *mut Event) -> c_int;
 }
 
 #[repr(C)]
@@ -42,9 +42,9 @@ impl<'a> Iterator for EventIter<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         unsafe {
-            let ev = null_mut();
-            if ManyMouse_PollEvent(ev) != 0 {
-                Some(*ev)
+            let mut ev = MaybeUninit::uninit();
+            if ManyMouse_PollEvent(ev.as_mut_ptr()) != 0 {
+                Some(ev.assume_init())
             } else {
                 None
             }
