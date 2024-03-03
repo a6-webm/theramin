@@ -21,7 +21,7 @@ fn main() {
 
 #[component]
 fn App(cx: Scope) -> Element {
-    use_effect(cx, (), |()| {
+    use_on_create(cx, || {
         tokio::spawn(async move {
             let mut m_mouse = ManyMouse::new();
             println!("{}", m_mouse.driver_name());
@@ -34,7 +34,7 @@ fn App(cx: Scope) -> Element {
             stdin.read_line(&mut buffer).unwrap();
             let dev_idx: u32 = buffer.trim().parse().unwrap();
 
-            let mut midi_h = MidiInitialiser::new().virtual_port();
+            let mut midi_h = MidiInitialiser::new().virtual_port("port_1");
 
             let mut input_h = InputHandler::new(50);
 

@@ -35,8 +35,8 @@ impl MidiInitialiser {
             .collect()
     }
 
-    pub fn virtual_port(self) -> MidiHandler {
-        MidiHandler::new(self.midi_out.create_virtual("virt_out").unwrap())
+    pub fn virtual_port(self, name: &str) -> MidiHandler {
+        MidiHandler::new(self.midi_out.create_virtual(name).unwrap())
     }
 
     pub fn connect(self, port: (String, &MidiOutputPort)) -> MidiHandler {
