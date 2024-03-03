@@ -1,41 +1,48 @@
 use crate::midi::{Pitch, HIGHEST_MIDI_NOTE};
 
-const DEFAULT_POS: f64 = 0.0; // TODO experiment with this value
-const NOTE_WIDTH: f64 = 100.0; // TODO experiment with this value
-
 pub struct InputHandler {
-    pos: f64,
-    max_pos: f64,
-    note_boundaries: Vec<f64>,
+    pos: u32,
+    max_pos: u32,
+    note_boundaries: Vec<u32>,
     playing: bool,
 }
 
 impl InputHandler {
-    pub fn new() -> Self {
+    pub fn new(note_width: u16) -> Self {
         let note_boundaries = (0..(HIGHEST_MIDI_NOTE + 1))
-            .map(|i| (i + 1) as f64 * NOTE_WIDTH)
+            .map(|i| (i + 1) as u32 * note_width as u32)
             .collect();
+        let max_pos = (HIGHEST_MIDI_NOTE + 1) as u32 * note_width as u32;
         InputHandler {
-            pos: DEFAULT_POS,
-            max_pos: (HIGHEST_MIDI_NOTE + 1) as f64 * NOTE_WIDTH,
+            pos: max_pos / 2,
+            max_pos,
             note_boundaries,
             playing: false,
         }
     }
 
     pub fn reset(&mut self) {
-        self.pos = DEFAULT_POS;
+        self.pos = self.max_pos / 2;
         self.playing = false;
     }
 
-    pub fn handle_rel_move(&mut self, mov: f64) -> Pitch {
-        self.pos = (self.pos + mov).clamp(0.0, self.max_pos);
+    fn handle_rel_move(&mut self, mov: i32) -> Pitch {
+        if mov > 0 {
+            self.pos = (self.pos + mov as u32).min(self.max_pos - 1);
+        } else {
+            let mov = mov.abs() as u32;
+            if mov > self.pos {
+                self.pos = 0;
+            } else {
+                self.pos = self.pos - mov;
+            }
+        }
         self.pitch_from_pos()
     }
 
     pub fn pitch_from_pos(&self) -> Pitch {
         for (i, bound) in self.note_boundaries.iter().enumerate() {
-            if self.pos <= *bound {
+            if self.pos < *bound {
                 return i as Pitch;
             }
         }
