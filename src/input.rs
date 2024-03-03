@@ -4,7 +4,7 @@ pub struct InputHandler {
     pos: u32,
     max_pos: u32,
     note_boundaries: Vec<u32>,
-    playing: bool,
+    pub playing: bool,
 }
 
 impl InputHandler {
@@ -26,7 +26,7 @@ impl InputHandler {
         self.playing = false;
     }
 
-    fn handle_rel_move(&mut self, mov: i32) -> Pitch {
+    pub fn handle_rel_move(&mut self, mov: i32) -> Pitch {
         if mov > 0 {
             self.pos = (self.pos + mov as u32).min(self.max_pos - 1);
         } else {

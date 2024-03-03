@@ -33,6 +33,16 @@ pub struct Event {
     pub maxval: c_int,
 }
 
+pub enum Axis {
+    X = 0,
+    Y,
+}
+
+pub enum Button {
+    LMB = 0,
+    RMB,
+}
+
 pub struct EventIter<'a> {
     _mm: &'a mut ManyMouse,
 }
