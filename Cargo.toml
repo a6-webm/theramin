@@ -10,3 +10,6 @@ midir = "0.9.1"
 dioxus = "0.4.3"
 dioxus-desktop = "0.4.3"
 tokio = "1.36.0"
+
+[build-dependencies]
+cc = "1.0.88"
