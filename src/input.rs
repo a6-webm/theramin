@@ -26,6 +26,14 @@ impl InputHandler {
         self.playing = false;
     }
 
+    pub fn pos(&self) -> u32 {
+        self.pos
+    }
+
+    pub fn max_pos(&self) -> u32 {
+        self.max_pos
+    }
+
     pub fn handle_rel_move(&mut self, mov: i32) -> Pitch {
         if mov > 0 {
             self.pos = (self.pos + mov as u32).min(self.max_pos - 1);

@@ -9,7 +9,7 @@ edition = "2021"
 midir = "0.9.1"
 dioxus = "0.4.3"
 dioxus-desktop = "0.4.3"
-tokio = "1.36.0"
+tokio = { version = "1.36.0", features = ["sync"] }
 
 [build-dependencies]
 cc = "1.0.88"
