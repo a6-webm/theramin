@@ -2,7 +2,7 @@ use dioxus::prelude::ScopeState;
 use std::{future::Future, sync::Arc};
 use tokio::sync::watch;
 
-pub fn use_watch_routine<T, F>(
+pub fn use_theramin_routine<T, F>(
     cx: &ScopeState,
     init_ch: T,
     routine: impl FnOnce(WatchTx<T>) -> F,

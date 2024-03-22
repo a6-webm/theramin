@@ -1,0 +1,29 @@
+refresh button redoes thread
+
+message passing stuff:
+one shot channel to send device list
+to thread:
+- set_sense(device: usize)
+- select_device(device: usize)
+- deselect_device(device: usize)
+out of thread:
+- list of devices, one time channel
+- device disconnected
+
+something like a use_context on a reciever cause they can get cloned
+honestly might need to use_context on a Mutex'ed transmitter for sending sense values
+
+/--------------------------------------------\
+| refresh  |                                 |
+| -mouse1- |  mouse1 sense: ---O------ 0.7x  |
+|  mouse2  |                                 |
+| -mouse3- |  A   Bb  B   C   Db  D   Eb  E  |
+|  mouse4  |                                 |
+|  mouse5  |                                 |
+|          |  mouse3 sense: -------O-- 2.8x  |
+|          |                                 |
+|          |  A   Bb  B   C   Db  D   Eb  E  |
+|          |                                 |
+|          |                                 |
+|          |                                 |
+\--------------------------------------------/

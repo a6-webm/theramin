@@ -1,5 +1,5 @@
 pub mod input;
 pub mod manymouse;
 pub mod midi;
-pub mod use_watch_routine;
-pub use use_watch_routine::*;
+pub mod use_theramin_routine;
+pub use use_theramin_routine::*;
