@@ -14,9 +14,9 @@ fn main() {
     // simple_logger::init_with_level(log::Level::Debug).unwrap();
     dioxus_desktop::launch_cfg(
         App,
-        Config::default().with_window(WindowBuilder::new().with_inner_size(
-            dioxus_desktop::wry::application::dpi::LogicalSize::new(400.0, 800.0),
-        )),
+        Config::default().with_window(
+            WindowBuilder::new(), // .with_inner_size(dioxus_desktop::wry::application::dpi::LogicalSize::new(400.0, 800.0),)
+        ),
     );
 }
 
@@ -68,9 +68,25 @@ fn App(cx: Scope) -> Element {
     // let pos = rx.read().unwrap().to_owned();
 
     render! {
+        style {
+            "html, body {{
+                margin: 0;
+                padding: 0;
+            }}
+            * {{
+                box-sizing: border-box;
+            }}
+            "
+        },
         div {
+            width: "100vw",
+            height: "100vh",
+            border: "dashed red",
+            background_color: "lightskyblue",
+            display: "flex",
+            flex_direction: "row",
             DevBar {},
-            ThereminList {}
+            ThereminList {},
         }
     }
 }
@@ -79,8 +95,10 @@ fn App(cx: Scope) -> Element {
 fn DevBar(cx: Scope) -> Element {
     render! {
         div {
+            flex: "0 1 12em",
+            border: "dashed red",
             RefreshButton {},
-            DevList {}
+            DevList {},
         }
     }
 }
@@ -111,6 +129,8 @@ fn ThereminList(cx: Scope) -> Element {
     let uh = vec!["mouse_1", "mouse_2", "mouse_3"];
     render! {
         div {
+            flex: "1 1 auto",
+            border: "dashed red",
             for dev in uh {
                 Theremin {
                     name: dev
