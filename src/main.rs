@@ -10,6 +10,20 @@ use theramin::{
     use_theramin_routine::*,
 };
 
+struct Dev {
+    name: String,
+    selected: bool,
+}
+
+impl Dev {
+    fn new(name: &str) -> Self {
+        Dev {
+            name: name.to_string(),
+            selected: false,
+        }
+    }
+}
+
 fn main() {
     // simple_logger::init_with_level(log::Level::Debug).unwrap();
     dioxus_desktop::launch_cfg(
@@ -67,6 +81,13 @@ fn App(cx: Scope) -> Element {
 
     // let pos = rx.read().unwrap().to_owned();
 
+    let dev_list = use_ref(cx, || {
+        ["mouse_1", "mouse_2", "mouse_3"]
+            .iter()
+            .map(|s| Dev::new(s))
+            .collect::<Vec<Dev>>()
+    });
+
     render! {
         style {
             "html, body {{
@@ -82,20 +103,20 @@ fn App(cx: Scope) -> Element {
             background_color: "#00001a",
             display: "flex",
             flex_direction: "row",
-            DevBar {},
-            ThereminList {},
+            DevBar { dev_list: dev_list },
+            ThereminList { dev_list: dev_list },
         }
     }
 }
 
 #[component]
-fn DevBar(cx: Scope) -> Element {
+fn DevBar<'a>(cx: Scope, dev_list: &'a UseRef<Vec<Dev>>) -> Element {
     render! {
         div {
             flex: "0 0 12em",
             border: "solid white",
             RefreshButton {},
-            DevList {},
+            DevList { dev_list: dev_list },
         }
     }
 }
@@ -103,39 +124,56 @@ fn DevBar(cx: Scope) -> Element {
 #[component]
 fn RefreshButton(cx: Scope) -> Element {
     render! {
-        "Refresh"
-    }
-}
-
-#[component]
-fn DevList(cx: Scope) -> Element {
-    let uh = vec!["mouse_1", "mouse_2", "mouse_3"];
-    render! {
-        div {
-            for dev in uh {
-                div {
-                    dev
-                }
-            }
+        button {
+            "type": "button",
+            display: "block",
+            margin: "0 auto",
+            "Refresh"
         }
     }
 }
 
 #[component]
-fn ThereminList(cx: Scope) -> Element {
-    let uh = vec!["mouse_1", "mouse_2", "mouse_3"];
-    render! {
-        div {
-            flex: "1 1 100%",
-            min_width: "0",
-            border: "solid white",
-            for dev in uh {
-                Theremin {
-                    name: dev
+fn DevList<'a>(cx: Scope, dev_list: &'a UseRef<Vec<Dev>>) -> Element {
+    dev_list.with(|list| {
+        let devs = list.iter().enumerate().map(|(i, d)| (i, &d.name));
+        render! {
+            div {
+                for (i, dev_name) in devs {
+                    button {
+                        "type": "button",
+                        width: "100%",
+                        display: "block",
+                        onclick: move |_| {
+                            dev_list.with_mut(|list| {
+                                list[i].selected = !list[i].selected;
+                            });
+                        },
+                        "{dev_name}",
+                    }
                 }
             }
         }
-    }
+    })
+}
+
+#[component]
+fn ThereminList<'a>(cx: Scope, dev_list: &'a UseRef<Vec<Dev>>) -> Element {
+    dev_list.with(|list| {
+        let enabled_dev_names = list.iter().filter(|d| d.selected).map(|d| &d.name);
+        render! {
+            div {
+                flex: "1 1 100%",
+                min_width: "0",
+                border: "solid white",
+                for dev_name in enabled_dev_names {
+                    Theremin {
+                        name: "{dev_name}"
+                    }
+                }
+            }
+        }
+    })
 }
 
 #[component]
@@ -155,14 +193,14 @@ fn Theremin<'a>(cx: Scope, name: &'a str) -> Element {
 
 #[component]
 fn NoteBar(cx: Scope, note_width: f32, note_scroll: f32) -> Element {
-    let offset = 25.0 - note_scroll * (note_width / 2.0);
+    let offset = 50.0 - note_scroll * note_width;
     render! {
         div {
             display: "block",
             overflow: "clip",
             white_space: "nowrap",
             div {
-                margin: "{offset}%",
+                margin_left: "{offset}%",
                 display: "inline",
             }
             for note in 0..(HIGHEST_MIDI_NOTE+1) {
