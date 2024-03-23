@@ -6,7 +6,7 @@ use std::io;
 use theramin::{
     input::InputHandler,
     manymouse::{self, Axis, Button, ManyMouse},
-    midi::MidiInitialiser,
+    midi::{MidiInitialiser, Pitch, HIGHEST_MIDI_NOTE},
     use_theramin_routine::*,
 };
 
@@ -72,17 +72,14 @@ fn App(cx: Scope) -> Element {
             "html, body {{
                 margin: 0;
                 padding: 0;
-            }}
-            * {{
-                box-sizing: border-box;
+                color: white;
             }}
             "
         },
         div {
             width: "100vw",
             height: "100vh",
-            border: "dashed red",
-            background_color: "lightskyblue",
+            background_color: "#00001a",
             display: "flex",
             flex_direction: "row",
             DevBar {},
@@ -95,8 +92,8 @@ fn App(cx: Scope) -> Element {
 fn DevBar(cx: Scope) -> Element {
     render! {
         div {
-            flex: "0 1 12em",
-            border: "dashed red",
+            flex: "0 0 12em",
+            border: "solid white",
             RefreshButton {},
             DevList {},
         }
@@ -129,8 +126,9 @@ fn ThereminList(cx: Scope) -> Element {
     let uh = vec!["mouse_1", "mouse_2", "mouse_3"];
     render! {
         div {
-            flex: "1 1 auto",
-            border: "dashed red",
+            flex: "1 1 100%",
+            min_width: "0",
+            border: "solid white",
             for dev in uh {
                 Theremin {
                     name: dev
@@ -144,7 +142,44 @@ fn ThereminList(cx: Scope) -> Element {
 fn Theremin<'a>(cx: Scope, name: &'a str) -> Element {
     render! {
         div {
-            name
+            div {
+                name
+            },
+            NoteBar {
+                note_width: 4.0,
+                note_scroll: 127.5,
+            },
+        }
+    }
+}
+
+#[component]
+fn NoteBar(cx: Scope, note_width: f32, note_scroll: f32) -> Element {
+    let offset = 25.0 - note_scroll * (note_width / 2.0);
+    render! {
+        div {
+            display: "block",
+            overflow: "clip",
+            white_space: "nowrap",
+            div {
+                margin: "{offset}%",
+                display: "inline",
+            }
+            for note in 0..(HIGHEST_MIDI_NOTE+1) {
+                div {
+                    width: "{note_width}%",
+                    box_sizing: "border-box",
+                    border: "solid grey",
+                    text_align: "center",
+                    display: "inline-block",
+                    white_space: "nowrap",
+                    note.to_string()
+                }
+            },
+            div {
+                text_align: "center",
+                "^"
+            }
         }
     }
 }
