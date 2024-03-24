@@ -26,12 +26,9 @@ impl InputHandler {
         self.playing = false;
     }
 
-    pub fn pos(&self) -> u32 {
-        self.pos
-    }
-
-    pub fn max_pos(&self) -> u32 {
-        self.max_pos
+    // TODO this might be one off
+    pub fn float_pos(&self) -> f32 {
+        (HIGHEST_MIDI_NOTE + 1) as f32 * self.pos as f32 / self.max_pos as f32
     }
 
     pub fn handle_rel_move(&mut self, mov: i32) -> Pitch {
