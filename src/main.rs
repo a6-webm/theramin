@@ -6,17 +6,18 @@ use dioxus_desktop::{Config, LogicalSize, WindowBuilder};
 use theramin::{midi::HIGHEST_MIDI_NOTE, use_theramin_routine::*};
 
 fn main() {
-    dioxus_desktop::launch_cfg(
+    dioxus_desktop::launch::launch(
         App,
+        vec![],
         Config::default()
             .with_window(WindowBuilder::new().with_inner_size(LogicalSize::new(400.0, 800.0))),
     );
 }
 
 #[component]
-fn App(cx: Scope) -> Element {
-    use_theramin_routine(cx);
-    render! {
+fn App() -> Element {
+    use_theramin_routine();
+    rsx! {
         style {
             "html, body {{
                 margin: 0;
@@ -38,8 +39,8 @@ fn App(cx: Scope) -> Element {
 }
 
 #[component]
-fn DevBar(cx: Scope) -> Element {
-    render! {
+fn DevBar() -> Element {
+    rsx! {
         div {
             flex: "0 0 12em",
             border: "solid white",
@@ -50,8 +51,8 @@ fn DevBar(cx: Scope) -> Element {
 }
 
 #[component]
-fn RefreshButton(cx: Scope) -> Element {
-    render! {
+fn RefreshButton() -> Element {
+    rsx! {
         button {
             "type": "button",
             display: "block",
@@ -62,68 +63,62 @@ fn RefreshButton(cx: Scope) -> Element {
 }
 
 #[component]
-fn DevList<'a>(cx: Scope) -> Element {
-    let device_list = use_shared_state::<Devices>(cx).unwrap();
-    device_list.with(|list| {
-        render! {
-            div {
-                for dev in list.iter().cloned() {
-                    button {
-                        "type": "button",
-                        width: "100%",
-                        display: "block",
-                        onclick: move |_| {
-                            device_list.to_owned().with_mut(|list| {
-                                list[dev.id].selected = !list[dev.id].selected;
-                            });
-                        },
-                        "{dev.name}",
-                    }
+fn DevList() -> Element {
+    let devices: Signal<Devices> = use_context();
+    let theramin_msg_tx: Signal<TheraminMsgTx> = use_context();
+    devices.with(|devices| {
+        let buttons = devices.iter().cloned().map(|dev| {
+            let text = format!("{}{}", dev.name, if dev.selected { "x " } else { "" });
+            rsx! {
+                button {
+                    "type": "button",
+                    width: "100%",
+                    display: "block",
+                    onclick: move |_| {
+                        theramin_msg_tx.read().send(Msg::ClickDev(dev.id));
+                    },
+                    "{text}",
                 }
+            }
+        });
+        rsx! {
+            div {
+                {buttons}
             }
         }
     })
 }
 
 #[component]
-fn ThereminList<'a>(cx: Scope) -> Element {
-    let device_list = use_shared_state::<Devices>(cx).unwrap();
-    device_list.with(|list| {
-        render! {
-            div {
-                flex: "1 1 100%",
-                min_width: "0",
-                border: "solid white",
-                for dev in list.iter().filter(|d| d.selected) {
-                    Theremin {
-                        dev: dev.clone()
-                    }
-                }
-            }
-        }
-    })
-}
-
-#[component]
-fn Theremin(cx: Scope, dev: Dev) -> Element {
-    let mouse_pos = use_mouse_pos(cx, dev.id);
-    render! {
+fn ThereminList() -> Element {
+    println!("rendered ThereminList");
+    let devices: Signal<Devices> = use_context();
+    let theremin_positions = use_theremin_positions();
+    rsx! {
         div {
-            div {
-                "{dev.name}"
-            },
-            NoteBar {
-                note_width: 4.0,
-                note_scroll: mouse_pos,
-            },
+            flex: "1 1 100%",
+            min_width: "0",
+            border: "solid white",
+            for dev in devices.iter().filter(|d| d.selected) {
+                div {
+                    div {
+                        "{dev.name}"
+                    },
+                    NoteBar {
+                        note_width: 4.0, // TODO be able to change
+                        note_scroll: theremin_positions.read()[dev.id],
+                    },
+                }
+            }
         }
     }
 }
 
 #[component]
-fn NoteBar(cx: Scope, note_width: f32, note_scroll: f32) -> Element {
+fn NoteBar(note_width: f32, note_scroll: f32) -> Element {
+    println!("rendered NoteBar");
     let offset = 50.0 - note_scroll * note_width;
-    render! {
+    rsx! {
         div {
             display: "block",
             overflow: "clip",
@@ -140,7 +135,7 @@ fn NoteBar(cx: Scope, note_width: f32, note_scroll: f32) -> Element {
                     text_align: "center",
                     display: "inline-block",
                     white_space: "nowrap",
-                    note.to_string()
+                    "{note}"
                 }
             },
             div {
