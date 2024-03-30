@@ -52,11 +52,15 @@ fn DevBar() -> Element {
 
 #[component]
 fn RefreshButton() -> Element {
+    let theramin_msg_tx: Signal<TheraminMsgTx> = use_context();
     rsx! {
         button {
             "type": "button",
             display: "block",
             margin: "0 auto",
+            onclick: move |_| {
+                theramin_msg_tx.read().send(Msg::FindNewDevices);
+            },
             "Refresh"
         }
     }
@@ -99,14 +103,18 @@ fn ThereminList() -> Element {
             flex: "1 1 100%",
             min_width: "0",
             border: "solid white",
-            for dev in devices.iter().filter(|d| d.selected) {
+            for (dev, pos) in devices
+                .iter()
+                .filter(|d| d.selected)
+                .zip(theremin_positions.read().iter().cloned())
+            {
                 div {
                     div {
                         "{dev.name}"
                     },
                     NoteBar {
                         note_width: 4.0, // TODO be able to change
-                        note_scroll: theremin_positions.read()[dev.id],
+                        note_scroll: pos,
                     },
                 }
             }
