@@ -128,7 +128,11 @@ fn DevList() -> Element {
     let theramin_msg_tx: Signal<TheraminMsgTx> = use_context();
     devices.with(|devices| {
         let buttons = devices.iter().cloned().map(|dev| {
-            let text = format!("{}{}", dev.name, if dev.selected { "x " } else { "" });
+            let text = if dev.selected {
+                format!("-- {} --", dev.name)
+            } else {
+                dev.name
+            };
             rsx! {
                 button {
                     "type": "button",
