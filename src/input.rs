@@ -26,7 +26,6 @@ impl InputHandler {
         self.playing = false;
     }
 
-    // TODO this might be one off
     pub fn float_pos(&self) -> f32 {
         (HIGHEST_MIDI_NOTE + 1) as f32 * self.pos as f32 / self.max_pos as f32
     }

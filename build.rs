@@ -6,6 +6,6 @@ fn main() {
         .file("manymouse/manymouse.c")
         .file("manymouse/windows_wminput.c")
         .file("manymouse/x11_xinput2.c")
-        .define("SUPPORT_XINPUT2", Some("0")) // TODO check that this is doing the right thing
+        .define("SUPPORT_XINPUT2", Some("0"))
         .compile("manymouse");
 }
