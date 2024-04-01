@@ -8,7 +8,7 @@ use crate::{
 };
 
 const MSG_BUFF_SIZE: usize = 30;
-const DEFAULT_NOTE_WIDTH: u16 = 50;
+const DEFAULT_NOTE_WIDTH: u16 = 200;
 
 type MsgTx = mpsc::Sender<Msg>;
 
@@ -192,6 +192,7 @@ pub fn use_theramin_routine() {
                         }
                     }
                 }
+                // TODO detect when device disconnected
                 for ev in s.m_mouse.poll() {
                     if s.dev_states[ev.device as usize].selected.is_none() {
                         continue;
